@@ -1,7 +1,18 @@
-Home Energy Centre using Raspberry Pi and Nook Simple touch
+Version 2 of a Home Energy Centre using Raspberry Pi
 
 This software displays:
 
 Solar PV data
 Solar Thermal (hot water) data
 Curent Weather data
+
+
+Work in progress.
+
+aims are to:
+
+rework the Resol collection code into Python [ done ] - no longer reliant on other code
+develop the Resol collection code on Arduino and implement on an ESP8266 sending via MQTT over WiFi [ to do ]
+completely re-write the front end display code - technology still be chosen [ to do ] 
+
+Gareth.
