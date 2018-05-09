@@ -1,6 +1,6 @@
 /* VBUS decoder sketch to MQTT for ESP8266 
  * Author : G. Naylor 
- * Version 001
+ * Version 002
  * 
  * Version History
  * Version 001 - strip out not needed code, make specific for BS/4 (DeltaSol 2009)
@@ -33,33 +33,11 @@
  * All other trademarks are the property of their respective owners.
  * 
  * 
- * * What does it do?
- * This sketch reads the VBus data and depending on the format of the controller decodes
- * the data and puts in in variables.
- * You can then send the values via HTTP GET requests to Domoticz.
- * 
- * In this sketch the VBus data is read out continously and send periodically to Domoticz
- * If the VBus is read out periodically, it sometimes reads nothing and you get all zero's.
- * 
- * * Currently supports the following controllers:
- * -Resol DeltaTherm FK (a.k.a. Oranier Aquacontrol III) 
- * -Conergy DT5
- * -Joule / Resol Deltasol C
- * If it does not find any of the supported controllers,
- * it will try to decode the first 2 frames which usually contain Temp 1 to 4.
- * 
- * * My controller is not in your list, how can I add it?
- * Go to http://danielwippermann.github.io/resol-vbus/vbus-packets.html
- * and find your controller. In the list you can see which information the controller sends.
- * You need the controller ID and offset, bitsize and names of all the variables.
- * Now use the examples for the DT5 and FK in VBusRead()
- * to create a new entry for your own controller.
- * 
  * Sketch is based on VBus library from 'Willie' from the Mbed community.
  *  
  */
 
-long intervalvbus = 30000;   // interval at which to send data (milliseconds)
+long intervalvbus = 25000;   // interval at which to send data (milliseconds)
 
 // Settings for the VBus decoding
 #define Sync  0xAA  // Synchronisation bytes
@@ -112,6 +90,32 @@ Serial.println("ESP8266 debugging started");
 
 // for V2+ add code to setup and connect to Wifi here
 // add code to setup payload and MQTT connection here
+
+ // We start by connecting to a WiFi network
+#if DEBUG
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+#endif  
+  
+WiFi.begin(ssid, password);
+
+while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+#if DEBUG
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("Netmask: ");
+  Serial.println(WiFi.subnetMask());
+  Serial.print("Gateway: ");
+  Serial.println(WiFi.gatewayIP());
+#endif 
 
 
 all=false;
@@ -342,7 +346,8 @@ char sync1 = 0xAA;
             
             Version=Buffer[F+3] << 8| Buffer[F+2];
 
-            ///******************* End of frames ****************
+            //******************* End of frames ****************
+            
 
            }// end 0x427B Deltasol BS 2009        
         } // end if command 0x0100
