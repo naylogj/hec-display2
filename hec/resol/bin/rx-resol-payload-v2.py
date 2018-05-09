@@ -15,12 +15,12 @@
 import os, sys, time
 import paho.mqtt.subscribe as subscribe
 
-debug = 1	# debug if True
+debug = 0	# debug if True
 
 # Configuration Variables
-_mqtt_host = ""						# IP address of MQTT Broker
+_mqtt_host = "192.x.y.z"						# IP address of MQTT Broker
 _mqtt_topic = "resol/prod/single"				# Topic 
-_datafile = "/home/pi/resol/www/hwinst.json"	# its not json!
+_datafile = "/home/pi/resol/www/hwinst.json"	# 
 _message = ""									# string for holding message
 _buffer = []									# list for holding data
 
@@ -50,7 +50,6 @@ def got_msg(client, userdata, message):
         print(_message)
         print("_buffer contains:")
         print(_buffer)
-        print("\n")
         
 	# now calculate max temp gain
     wtemp=float(_buffer[2])
@@ -62,8 +61,8 @@ def got_msg(client, userdata, message):
     
     if wtemp > tmin:
         tgain=round(tmax-tmin,1)
-    else: 
-        tgain= round(tmin-tmax,1)
+    #else: 	# comment out these 2 lines for production as we do not want -ve gains.
+     #   tgain= round(tmin-tmax,1)   
 		
     # now calculate number of hours pumped.
     # assume no generation before 05:00am - so capture the number of hours pumped
@@ -91,23 +90,23 @@ def got_msg(client, userdata, message):
     if debug: print("Temp gain is %s degress" % tgain)
     if debug: print("Hours Pumped %s" % hrs_pumped)
    
-    # put the new data in to the buffer
-    _buffer.append(tgain)
-    _buffer.append(hrs_pumped)
+    # put the new data in to the buffer as strings
+    _buffer.append(str(tgain))
+    _buffer.append(str(hrs_pumped))
     if debug:
         print("_buffer now contains:")
         print(_buffer)
 	 
     # so we now have some data so store it in a file
     # for the HEC-code to pick up
-    # esure we can write a file
-    #try:
-     #   f=open(_datafile,"w")		# open the file
-      #  f.write(message.payload.decode('ascii'))	# write the payload (convert from bin)
-       # f.close()					# close the file
-    #except:
-     #   print("Error writing to {} ", _datafile)
-      #  f.close()					# ensure file handle is closed
+    # ensure we can write a file
+    try:
+        f=open(_datafile,"w+")		# open the file for non binary write
+        f.write(','.join(_buffer))	# write the buffer as a CSV string
+        f.close()					# close the file
+    except:
+        print("Error writing to {} ", _datafile)
+        f.close()					# ensure file handle is closed
 	
 # ---------------------- main -----------------------------------------
 
