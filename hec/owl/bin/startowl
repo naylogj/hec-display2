@@ -1,3 +1,4 @@
 #!/bin/bash
 cd /home/pi/owl/bin
-nohup /home/pi/owl/bin/owl-rx-data-v1.py &
+#nohup /home/pi/owl/bin/owl-rx-data-v1.py &
+nohup /home/pi/owl/bin/owl-rx-data-v2.py &
