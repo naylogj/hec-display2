@@ -9,8 +9,9 @@
 # Author G. Naylor May 2018
 # V001 first version
 # V002 modified to calculate max temp gain in the day and hours pumped
+# V002.1 Bugfix for hours
 # 
-# Version 2
+# Version 2.1
 
 import os, sys, time
 import paho.mqtt.subscribe as subscribe
@@ -31,7 +32,7 @@ tmin=float(150)
 # after program has been started
 samples = False		
 
-st_hours_pumped = float(8347)	# random initial setting
+st_hours_pumped = float(8377)	# random initial setting
 
 # incoming message format is
 #    0         1            2           3            4             5
@@ -59,15 +60,19 @@ def got_msg(client, userdata, message):
     elif wtemp < tmin:
         tmin = wtemp
     
+    if debug: print("tmax is now: %s degress" % tmax)
+    if debug: print("tmin is now: %s degress" % tmin)
+
     if wtemp > tmin:
         tgain=round(tmax-tmin,1)
-    #else: 	# comment out these 2 lines for production as we do not want -ve gains.
-     #   tgain= round(tmin-tmax,1)   
+    else: 
+        tgain=round(tmin-tmax,1)   
 		
     # now calculate number of hours pumped.
     # assume no generation before 05:00am - so capture the number of hours pumped
     # at start of day and reset the temp min and max for the day to current temp
-    hours = int(time.strftime("%H").lstrip('0'))
+    # changed for v2.1 this line had a bug --> hours = int(time.strftime("%H").lstrip('0'))
+    hours = int(time.strftime("%H"))
     if hours < 5:
         st_hours_pumped = float(_buffer[4])
         tmax = wtemp
@@ -84,6 +89,7 @@ def got_msg(client, userdata, message):
     if not samples:
         hrs_pumped = float(0)
         tgain = float(0)
+        tmin = wtemp	# this is first time running today, so set min temp to current
         samples = True	# flip the flag
 	
 	# debugging lets see what we have
@@ -93,6 +99,7 @@ def got_msg(client, userdata, message):
     # put the new data in to the buffer as strings
     _buffer.append(str(tgain))
     _buffer.append(str(hrs_pumped))
+
     if debug:
         print("_buffer now contains:")
         print(_buffer)
@@ -105,7 +112,7 @@ def got_msg(client, userdata, message):
         f.write(','.join(_buffer))	# write the buffer as a CSV string
         f.close()					# close the file
     except:
-        print("Error writing to {} ", _datafile)
+        print("Error writing to %s " % _datafile)
         f.close()					# ensure file handle is closed
 	
 # ---------------------- main -----------------------------------------
