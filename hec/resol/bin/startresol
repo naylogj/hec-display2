@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/pi/resol/bin
+nohup /home/pi/resol/bin/rx-resol-payload-v3.py 2>&1 &
