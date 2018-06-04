@@ -25,7 +25,7 @@ case "$1" in
   stop)
     echo "Stopping owlmon"
     # kill application you want to stop
-    sudo killall owl-rx-data-v1.py
+    sudo killall owl-rx-data-v3.py
     ;;
   *)
     echo "Usage: /etc/init.d/owlmon {start|stop}"
