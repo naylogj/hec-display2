@@ -12,7 +12,7 @@ Work in progress.
 aims are to:
 
 rework the Resol collection code into Python [ done ] - no longer reliant on other code
-develop the Resol collection code on Arduino and implement on an ESP8266 sending via MQTT over WiFi [ to do ]
-completely re-write the front end display code - technology still be chosen [ to do ] 
+develop the Resol collection code to use MQTT for sending data, so that I can split out the HEC display function from the data gathering functions [ done - the Solar Hot Water code now runs on a separate Raspberry Pi Zero in Python ] 
+completely re-write the front end display code  - in progress - using the thingsboard.io service https://thingsboard.io
 
 Gareth.
