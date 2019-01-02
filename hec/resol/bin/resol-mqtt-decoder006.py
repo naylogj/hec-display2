@@ -135,7 +135,7 @@ S2_Temp = ((256*(frame_bytes[3]))+(frame_bytes[2]))*0.1 # Water Temp
 # S1_Temp = 65525
 
 # Check is S1 Temp is below freezing (Value will have wrapped around 16 bit number)
-if S1_Temp > 180:
+if S1_Temp > 1800:			# > 180 C
 	S1_Temp = -(65535 - S1_Temp)
 
 # Scale S1_Temp correctly
